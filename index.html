@@ -1,0 +1,2615 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#173d32">
+  <meta name="color-scheme" content="light">
+
+  <title>Aurelia Clinic | Medicina privada y bienestar</title>
+  <meta name="description" content="Diseño de demostración para una clínica privada ficticia. Descubre nuestras especialidades, conoce al equipo y solicita una cita.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Aurelia Clinic | Medicina privada y bienestar">
+  <meta property="og:description" content="Diseño de demostración para una clínica privada ficticia. Descubre nuestras especialidades, conoce al equipo y solicita una cita.">
+
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23173d32'/%3E%3Ctext x='32' y='45' font-size='36' text-anchor='middle' fill='%23dcc58f' font-family='Georgia,serif'%3EA%3C/text%3E%3C/svg%3E">
+
+  <!-- Tipografía: Fraunces (títulos) + Manrope (texto). Con fallback del sistema. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://images.unsplash.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..500;1,9..144,300..500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Las animaciones de scroll solo se activan si hay JavaScript: sin JS todo el contenido es visible. -->
+  <script>document.documentElement.classList.add("js");</script>
+
+  <style>
+    /* ===== 1. VARIABLES Y CONFIGURACIÓN ===== */
+    :root {
+      --green: #173d32;
+      --green-light: #285747;
+      --green-deep: #0d2820;
+      --cream: #f8f6f0;
+      --cream-2: #efece3;
+      --white: #ffffff;
+      --gold: #b69a63;
+      --gold-light: #dcc58f;
+      --gold-ink: #7a6434;      /* dorado oscuro para texto: contraste AA sobre crema */
+      --text: #26352e;
+      --muted: #58645d;
+      --border: #e4e0d4;
+      --on-dark: #d6e0d9;
+      --danger: #a63a28;
+
+      --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+      --font-body: "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+      --ease: cubic-bezier(.22, 1, .36, 1);
+      --container: 1160px;
+      --header-h: 80px;
+
+      --radius-lg: 28px;
+      --radius-md: 18px;
+      --radius-sm: 12px;
+
+      --shadow-card: 0 1px 0 rgba(23, 61, 50, .04), 0 18px 40px -26px rgba(23, 61, 50, .3);
+      --shadow-lift: 0 2px 0 rgba(23, 61, 50, .03), 0 36px 60px -32px rgba(23, 61, 50, .4);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    * { margin: 0; padding: 0; }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: calc(var(--header-h) + 12px);
+      -webkit-text-size-adjust: 100%;
+    }
+
+    html.no-scroll { overflow: hidden; }
+
+    body {
+      font-family: var(--font-body);
+      font-size: 16px;
+      background: var(--cream);
+      color: var(--text);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+      overflow-x: clip;
+    }
+
+    img { display: block; max-width: 100%; }
+    a { color: inherit; text-decoration: none; }
+    ul { list-style: none; }
+    button, input, select, textarea { font: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+
+    :focus-visible {
+      outline: 3px solid var(--gold);
+      outline-offset: 3px;
+      border-radius: 6px;
+    }
+
+    ::selection { background: var(--gold-light); color: var(--green-deep); }
+
+    .sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
+
+    .icon {
+      width: 1em;
+      height: 1em;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      flex-shrink: 0;
+    }
+
+    .skip-link {
+      position: fixed;
+      left: 16px;
+      top: -70px;
+      z-index: 100;
+      padding: 12px 20px;
+      border-radius: 100px;
+      background: var(--green);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      transition: top .3s var(--ease);
+    }
+
+    .skip-link:focus { top: 16px; }
+
+    .container {
+      width: min(var(--container), calc(100% - 48px));
+      margin-inline: auto;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--gold-ink);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 28px;
+      height: 1px;
+      background: currentColor;
+    }
+
+    h1, h2, h3, .brand {
+      font-family: var(--font-display);
+      font-weight: 400;
+      line-height: 1.1;
+      font-optical-sizing: auto;
+    }
+
+    h1, h2, h3 { text-wrap: balance; }
+
+    h2 {
+      font-size: clamp(34px, 4.4vw, 56px);
+      letter-spacing: -.025em;
+      color: var(--green);
+    }
+
+    p { text-wrap: pretty; }
+
+    .section-heading {
+      max-width: 660px;
+      margin-bottom: clamp(36px, 5vw, 60px);
+    }
+
+    .section-heading h2 { margin-top: 18px; }
+
+    .section-heading p {
+      color: var(--muted);
+      margin-top: 18px;
+      max-width: 540px;
+    }
+
+    .section-pad { padding: clamp(72px, 9vw, 128px) 0; }
+
+    /* Grano sutil para dar textura a fondos grandes */
+    .grain {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: .06;
+      mix-blend-mode: multiply;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    /* ===== 2. BOTONES Y ENLACES ===== */
+    .button {
+      position: relative;
+      isolation: isolate;
+      overflow: hidden;
+      min-height: 52px;
+      padding: 14px 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      border: 1px solid transparent;
+      border-radius: 100px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: .02em;
+      line-height: 1;
+      white-space: nowrap;
+      transition:
+        background-color .35s var(--ease),
+        color .35s var(--ease),
+        border-color .35s var(--ease),
+        box-shadow .35s var(--ease),
+        transform .2s var(--ease),
+        translate .45s var(--ease);
+    }
+
+    .button:active { transform: scale(.97); }
+
+    .button .arrow {
+      width: 18px;
+      height: 18px;
+      stroke-width: 1.8;
+      transition: transform .45s var(--ease);
+    }
+
+    .button:hover .arrow,
+    .text-link:hover .arrow { transform: translate(3px, -3px); }
+
+    .button-primary {
+      background: var(--green);
+      color: #fff;
+      box-shadow: 0 12px 26px -12px rgba(23, 61, 50, .6), inset 0 1px 0 rgba(255, 255, 255, .14);
+    }
+
+    /* Destello que recorre el botón al pasar el cursor */
+    .button-primary::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background: linear-gradient(110deg, transparent 25%, rgba(255, 255, 255, .22) 50%, transparent 75%);
+      translate: -130% 0;
+      transition: translate .9s var(--ease);
+    }
+
+    .button-primary:hover {
+      background: var(--green-light);
+      box-shadow: 0 18px 32px -14px rgba(23, 61, 50, .65), inset 0 1px 0 rgba(255, 255, 255, .14);
+    }
+
+    .button-primary:hover::before { translate: 130% 0; }
+
+    .button-outline {
+      color: var(--green);
+      border-color: rgba(23, 61, 50, .35);
+      background: transparent;
+    }
+
+    .button-outline:hover {
+      background: var(--green);
+      border-color: var(--green);
+      color: #fff;
+    }
+
+    .ripple {
+      position: absolute;
+      z-index: -1;
+      border-radius: 50%;
+      background: currentColor;
+      pointer-events: none;
+      animation: ripple .75s var(--ease) forwards;
+    }
+
+    .text-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      color: var(--green);
+      font-size: 14px;
+      font-weight: 700;
+      transition: color .3s;
+    }
+
+    .text-link .arrow {
+      width: 17px;
+      height: 17px;
+      stroke-width: 1.8;
+      transition: transform .45s var(--ease);
+    }
+
+    .text-link:hover { color: var(--gold-ink); }
+
+    /* ===== 3. CABECERA ===== */
+    .progress {
+      position: fixed;
+      inset: 0 0 auto 0;
+      height: 3px;
+      z-index: 60;
+      pointer-events: none;
+    }
+
+    .progress span {
+      display: block;
+      height: 100%;
+      background: linear-gradient(90deg, var(--gold), var(--gold-light));
+      transform: scaleX(0);
+      transform-origin: left;
+    }
+
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      height: var(--header-h);
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid transparent;
+      transition: background-color .4s, border-color .4s, box-shadow .4s, backdrop-filter .4s, -webkit-backdrop-filter .4s;
+    }
+
+    .header.is-scrolled,
+    .header.menu-open {
+      background: rgba(248, 246, 240, .82);
+      -webkit-backdrop-filter: blur(16px) saturate(1.4);
+      backdrop-filter: blur(16px) saturate(1.4);
+      border-bottom-color: var(--border);
+      box-shadow: 0 10px 30px -22px rgba(23, 61, 50, .35);
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .brand {
+      display: inline-block;
+      color: var(--green);
+      font-size: 27px;
+      letter-spacing: .08em;
+      white-space: nowrap;
+    }
+
+    .brand small {
+      display: block;
+      font-family: var(--font-body);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: .42em;
+      text-align: center;
+      margin-top: 3px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: clamp(18px, 2.4vw, 34px);
+    }
+
+    .nav-links a:not(.button) {
+      position: relative;
+      display: inline-block;
+      padding: 8px 0;
+      font-size: 14px;
+      font-weight: 500;
+      color: #46524b;
+      transition: color .3s;
+    }
+
+    .nav-links a:not(.button)::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 2px;
+      height: 1px;
+      background: var(--gold);
+      scale: 0 1;
+      transform-origin: left;
+      transition: scale .5s var(--ease);
+    }
+
+    .nav-links a:not(.button):hover,
+    .nav-links a[aria-current="true"] { color: var(--green); }
+
+    .nav-links a:not(.button):hover::after,
+    .nav-links a[aria-current="true"]::after { scale: 1 1; }
+
+    .nav > .button {
+      min-height: 44px;
+      padding: 10px 22px;
+      font-size: 13px;
+    }
+
+    .nav-cta-mobile { display: none; }
+
+    .menu-toggle {
+      display: none;
+      position: relative;
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, .65);
+      color: var(--green);
+      cursor: pointer;
+    }
+
+    .menu-toggle span {
+      position: absolute;
+      left: 14px;
+      right: 14px;
+      top: 50%;
+      height: 1.5px;
+      margin-top: -.75px;
+      border-radius: 2px;
+      background: currentColor;
+      transition: transform .5s var(--ease);
+    }
+
+    .menu-toggle span:nth-child(1) { transform: translateY(-4px); }
+    .menu-toggle span:nth-child(2) { transform: translateY(4px); }
+    .menu-toggle[aria-expanded="true"] span:nth-child(1) { transform: rotate(45deg); }
+    .menu-toggle[aria-expanded="true"] span:nth-child(2) { transform: rotate(-45deg); }
+
+    /* Botón flotante de cita (solo móvil) */
+    .mobile-cta { display: none; }
+
+    /* ===== 4. HERO ===== */
+    .hero {
+      position: relative;
+      isolation: isolate;
+      padding: clamp(28px, 4vw, 56px) 0 clamp(72px, 9vw, 120px);
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      will-change: transform;
+    }
+
+    .orb-gold {
+      width: min(680px, 72vw);
+      aspect-ratio: 1;
+      right: -12%;
+      top: -22%;
+      background: radial-gradient(circle, rgba(220, 197, 143, .6), rgba(220, 197, 143, 0) 68%);
+      animation: floatA 16s ease-in-out infinite alternate;
+    }
+
+    .orb-green {
+      width: min(600px, 64vw);
+      aspect-ratio: 1;
+      left: -16%;
+      bottom: -28%;
+      background: radial-gradient(circle, rgba(40, 87, 71, .2), rgba(40, 87, 71, 0) 68%);
+      animation: floatB 21s ease-in-out infinite alternate;
+    }
+
+    [data-parallax] { translate: 0 var(--py, 0px); }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr);
+      align-items: center;
+      gap: clamp(32px, 5vw, 70px);
+    }
+
+    .hero-copy { padding: 20px 0 20px 6px; }
+
+    .hero h1 {
+      font-size: clamp(40px, 4.7vw, 70px);
+      line-height: 1.04;
+      letter-spacing: -.03em;
+      color: var(--green);
+      margin: 26px 0 28px;
+    }
+
+    /* Cada línea del título se revela desde una máscara */
+    .line {
+      display: block;
+      overflow: hidden;
+      padding: 0 .1em .16em 0;
+      margin: 0 -.1em -.16em 0;
+    }
+
+    .line-inner {
+      display: block;
+      animation: lineUp 1.2s var(--ease) both;
+      animation-delay: var(--d, 0ms);
+    }
+
+    .hero h1 em {
+      font-style: italic;
+      font-weight: 300;
+      color: var(--gold-ink);
+      background: linear-gradient(100deg, #7a6434 10%, #b0903f 45%, #7a6434 80%);
+      background-size: 220% 100%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: shimmer 9s ease-in-out infinite alternate;
+    }
+
+    .hero-copy > p {
+      max-width: 460px;
+      color: var(--muted);
+      font-size: 17px;
+      margin-bottom: 34px;
+    }
+
+    .hero-fade {
+      animation: fadeUp 1.1s var(--ease) both;
+      animation-delay: var(--d, 0ms);
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .hero-note {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-top: 40px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .hero-note .rule {
+      width: 42px;
+      height: 1px;
+      background: var(--gold);
+    }
+
+    .hero-visual {
+      position: relative;
+      width: 100%;
+      max-width: 590px;
+      margin-left: auto;
+    }
+
+    .hero-ring {
+      position: absolute;
+      top: -18px;
+      left: -18px;
+      right: 18px;
+      bottom: 18px;
+      border: 1px solid var(--gold);
+      border-radius: 999px 999px 10px 10px;
+      opacity: .7;
+      translate: calc(var(--mx, 0) * -16px) calc(var(--my, 0) * -16px);
+      transition: translate .9s var(--ease);
+      animation: fadeIn 1.6s var(--ease) .5s both;
+    }
+
+    .hero-media {
+      position: relative;
+      height: clamp(380px, 66vh, 620px);
+      border-radius: 999px 999px 10px 10px;
+      overflow: hidden;
+      background: linear-gradient(165deg, #d9e2da, #efe8d6);
+      box-shadow: 0 50px 80px -50px rgba(23, 61, 50, .55);
+      animation: fadeUp 1.4s var(--ease) .15s both;
+    }
+
+    .hero-media img,
+    .about-media img {
+      position: absolute;
+      left: 0;
+      top: -9%;
+      width: 100%;
+      height: 118%;
+      object-fit: cover;
+      object-position: center;
+    }
+
+    .hero-media img { animation: imgSettle 2s var(--ease) both; }
+
+    .image-caption {
+      position: absolute;
+      left: -38px;
+      bottom: 44px;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      max-width: 290px;
+      padding: 16px 22px 16px 16px;
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, .78);
+      border: 1px solid rgba(255, 255, 255, .7);
+      -webkit-backdrop-filter: blur(14px) saturate(1.3);
+      backdrop-filter: blur(14px) saturate(1.3);
+      box-shadow: 0 24px 50px -24px rgba(13, 40, 32, .45);
+      translate: calc(var(--mx, 0) * 12px) calc(var(--my, 0) * 12px);
+      transition: translate .9s var(--ease);
+      animation: fadeUpT 1.2s var(--ease) .9s both;
+    }
+
+    .caption-icon {
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--green);
+      color: var(--gold-light);
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .image-caption strong {
+      display: block;
+      font-family: var(--font-display);
+      font-size: 19px;
+      line-height: 1.2;
+      color: var(--green);
+      font-weight: 400;
+    }
+
+    .image-caption span:not(.caption-icon) {
+      display: block;
+      margin-top: 2px;
+      font-size: 13px;
+      line-height: 1.4;
+      color: var(--muted);
+    }
+
+    /* ===== 5. FRANJA INFORMATIVA ===== */
+    .trust-strip {
+      position: relative;
+      overflow: hidden;
+      color: #fff;
+      padding: 30px 0;
+      background: linear-gradient(110deg, var(--green-deep), var(--green) 50%, var(--green-deep));
+    }
+
+    .trust-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 25px;
+    }
+
+    .trust-item {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      padding: 4px 10px;
+      border-right: 1px solid rgba(255, 255, 255, .16);
+    }
+
+    .trust-item:last-child { border-right: 0; }
+
+    .trust-icon {
+      width: 46px;
+      height: 46px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      border: 1px solid rgba(220, 197, 143, .5);
+      color: var(--gold-light);
+      font-size: 22px;
+      transition: background-color .4s, color .4s, rotate .6s var(--ease);
+    }
+
+    .trust-item:hover .trust-icon {
+      background: var(--gold-light);
+      color: var(--green-deep);
+      rotate: 8deg;
+    }
+
+    .trust-item strong {
+      display: block;
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .trust-item span:last-child {
+      display: block;
+      color: var(--on-dark);
+      font-size: 13px;
+    }
+
+    /* ===== 6. ESPECIALIDADES ===== */
+    .center-heading {
+      text-align: center;
+      margin-inline: auto;
+    }
+
+    .center-heading p { margin-inline: auto; }
+    .center-heading .eyebrow { justify-content: center; }
+
+    .specialty-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 22px;
+    }
+
+    .specialty-card {
+      position: relative;
+      isolation: isolate;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 36px 32px 32px;
+      box-shadow: var(--shadow-card);
+    }
+
+    /* Foco de luz que sigue al cursor */
+    .specialty-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background: radial-gradient(380px circle at var(--x, 50%) var(--y, 0%), rgba(182, 154, 99, .2), transparent 62%);
+      opacity: 0;
+      transition: opacity .5s;
+    }
+
+    .specialty-card:hover {
+      transform: translateY(-8px);
+      box-shadow: var(--shadow-lift);
+      border-color: #d9cba9;
+    }
+
+    .specialty-card:hover::before { opacity: 1; }
+
+    .card-index {
+      position: absolute;
+      top: 28px;
+      right: 30px;
+      font-family: var(--font-display);
+      font-size: 15px;
+      letter-spacing: .1em;
+      color: var(--gold-ink);
+    }
+
+    .specialty-icon {
+      width: 56px;
+      height: 56px;
+      display: grid;
+      place-items: center;
+      border: 1px solid #d9cba9;
+      border-radius: 50%;
+      background: var(--cream);
+      color: var(--green);
+      font-size: 25px;
+      margin-bottom: 30px;
+      transition: background-color .45s, color .45s, border-color .45s, rotate .7s var(--ease);
+    }
+
+    .specialty-card:hover .specialty-icon {
+      background: var(--green);
+      border-color: var(--green);
+      color: var(--gold-light);
+      rotate: -8deg;
+    }
+
+    .specialty-card h3 {
+      color: var(--green);
+      font-size: 27px;
+      letter-spacing: -.01em;
+      margin-bottom: 14px;
+    }
+
+    .specialty-card p {
+      flex: 1;
+      color: var(--muted);
+      font-size: 15px;
+      margin-bottom: 26px;
+    }
+
+    /* ===== 7. FILOSOFÍA ===== */
+    .about {
+      position: relative;
+      margin-inline: clamp(12px, 2vw, 28px);
+      border-radius: clamp(26px, 3.4vw, 48px);
+      background: var(--cream-2);
+    }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      gap: clamp(40px, 6vw, 84px);
+    }
+
+    .about-visual { position: relative; }
+
+    .about-visual::before {
+      content: "";
+      position: absolute;
+      inset: 26px -22px -22px 26px;
+      border: 1px solid var(--gold);
+      border-radius: var(--radius-lg);
+      opacity: .7;
+    }
+
+    .about-media {
+      position: relative;
+      z-index: 1;
+      height: clamp(360px, 42vw, 520px);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      background: linear-gradient(165deg, #d9e2da, #efe8d6);
+      box-shadow: 0 40px 70px -46px rgba(23, 61, 50, .55);
+    }
+
+    .about-copy h2 { margin: 18px 0 22px; }
+
+    .about-copy > p {
+      color: var(--muted);
+      font-size: 16px;
+      margin-bottom: 18px;
+    }
+
+    .about-points {
+      display: grid;
+      gap: 14px;
+      margin: 30px 0 36px;
+    }
+
+    .about-points li {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      font-size: 15px;
+    }
+
+    .check {
+      width: 26px;
+      height: 26px;
+      display: grid;
+      place-items: center;
+      margin-top: 1px;
+      border-radius: 50%;
+      background: rgba(182, 154, 99, .2);
+      color: var(--gold-ink);
+      font-size: 15px;
+      flex-shrink: 0;
+    }
+
+    .check .icon { stroke-width: 2.2; }
+
+    /* ===== 8. EQUIPO ===== */
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 22px;
+    }
+
+    .team-card {
+      overflow: hidden;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-card);
+    }
+
+    .team-card:hover {
+      transform: translateY(-8px);
+      box-shadow: var(--shadow-lift);
+    }
+
+    .team-photo-wrap {
+      position: relative;
+      aspect-ratio: 4 / 4.3;
+      overflow: hidden;
+      background: linear-gradient(165deg, #dfe6df, #efe9d9);
+    }
+
+    .team-photo {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 25%;
+      transition: scale 1.4s var(--ease);
+    }
+
+    .team-card:hover .team-photo { scale: 1.06; }
+
+    .team-photo-wrap::after {
+      content: "";
+      position: absolute;
+      inset: auto 0 0 0;
+      height: 40%;
+      background: linear-gradient(to top, rgba(13, 40, 32, .45), transparent);
+      opacity: 0;
+      transition: opacity .6s;
+    }
+
+    .team-card:hover .team-photo-wrap::after { opacity: 1; }
+
+    .team-info { padding: 26px 26px 28px; }
+
+    .team-role {
+      color: var(--gold-ink);
+      margin-bottom: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+
+    .team-info h3 {
+      color: var(--green);
+      font-size: 27px;
+      letter-spacing: -.01em;
+      margin-bottom: 8px;
+    }
+
+    .team-info p:last-child {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .demo-note {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      margin-top: 30px;
+      padding: 16px 20px;
+      border-left: 3px solid var(--gold);
+      border-radius: 4px var(--radius-sm) var(--radius-sm) 4px;
+      background: #f1ead9;
+      color: #5a4d2f;
+      font-size: 13px;
+    }
+
+    .demo-note .icon { margin-top: 3px; font-size: 16px; }
+
+    /* ===== 9. SOLICITUD DE CITA ===== */
+    .appointment {
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+      margin-inline: clamp(12px, 2vw, 28px);
+      border-radius: clamp(26px, 3.4vw, 48px);
+      color: #fff;
+      background:
+        radial-gradient(900px 520px at 90% -10%, rgba(182, 154, 99, .26), transparent 60%),
+        radial-gradient(760px 520px at -5% 105%, rgba(40, 87, 71, .9), transparent 62%),
+        var(--green);
+    }
+
+    .appointment .grain { mix-blend-mode: soft-light; opacity: .14; z-index: -1; }
+
+    .appointment-grid {
+      display: grid;
+      grid-template-columns: .8fr 1.2fr;
+      align-items: start;
+      gap: clamp(40px, 6vw, 84px);
+    }
+
+    .appointment .eyebrow { color: var(--gold-light); }
+
+    .appointment-copy h2 {
+      color: #fff;
+      font-size: clamp(36px, 4.4vw, 56px);
+      margin: 20px 0;
+    }
+
+    .appointment-copy > p {
+      color: var(--on-dark);
+      font-size: 16px;
+      margin-bottom: 34px;
+    }
+
+    .contact-detail {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      border-top: 1px solid rgba(255, 255, 255, .18);
+      padding-top: 20px;
+      margin-top: 20px;
+    }
+
+    .contact-detail .icon {
+      margin-top: 3px;
+      font-size: 20px;
+      color: var(--gold-light);
+    }
+
+    .contact-detail span {
+      display: block;
+      color: var(--gold-light);
+      text-transform: uppercase;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .16em;
+    }
+
+    .contact-detail p {
+      font-size: 15px;
+      margin-top: 4px;
+    }
+
+    .appointment-form {
+      background: #fff;
+      color: var(--text);
+      padding: clamp(26px, 3.4vw, 44px);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 50px 90px -40px rgba(0, 0, 0, .55);
+    }
+
+    .appointment-form h3 {
+      font-size: 32px;
+      letter-spacing: -.015em;
+      color: var(--green);
+      margin-bottom: 8px;
+    }
+
+    .form-intro {
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 28px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px 18px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .field-full { grid-column: 1 / -1; }
+
+    .field label,
+    .label-row label {
+      color: #3f4d45;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .label-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .char-count {
+      font-size: 12px;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      width: 100%;
+      min-width: 0;
+      border: 1px solid #d6d8cf;
+      border-radius: var(--radius-sm);
+      background: #fbfbf8;
+      color: var(--text);
+      padding: 13px 16px;
+      font-size: 15px;
+      transition: border-color .3s, box-shadow .3s, background-color .3s;
+    }
+
+    .field input::placeholder,
+    .field textarea::placeholder { color: #8a928c; }
+
+    .field input,
+    .field select { min-height: 50px; }
+
+    .field textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    .field select {
+      appearance: none;
+      -webkit-appearance: none;
+      padding-right: 44px;
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23173d32' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      background-size: 18px;
+    }
+
+    .field input:hover,
+    .field select:hover,
+    .field textarea:hover { border-color: #b9bdb2; }
+
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus {
+      outline: none;
+      border-color: var(--green);
+      background-color: #fff;
+      box-shadow: 0 0 0 4px rgba(182, 154, 99, .28);
+    }
+
+    .field.has-error input,
+    .field.has-error select,
+    .field.has-error textarea {
+      border-color: var(--danger);
+      background-color: #fffaf9;
+    }
+
+    .field.has-error input:focus,
+    .field.has-error select:focus,
+    .field.has-error textarea:focus { box-shadow: 0 0 0 4px rgba(166, 58, 40, .18); }
+
+    .field-error {
+      display: none;
+      color: var(--danger);
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.4;
+    }
+
+    .has-error > .field-error { display: block; animation: fadeUp .4s var(--ease) both; }
+
+    .consent-field { margin: 22px 0 22px; }
+
+    .form-consent {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 13px;
+      color: var(--muted);
+      cursor: pointer;
+    }
+
+    .form-consent input {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 22px;
+      height: 22px;
+      margin-top: 1px;
+      flex-shrink: 0;
+      border: 1.5px solid #b9bdb2;
+      border-radius: 7px;
+      background: #fbfbf8 center / 14px no-repeat;
+      cursor: pointer;
+      transition: background-color .3s, border-color .3s, box-shadow .3s;
+    }
+
+    .form-consent input:checked {
+      background-color: var(--green);
+      border-color: var(--green);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5 12.5 4.5 4.5L19 7.5'/%3E%3C/svg%3E");
+    }
+
+    .form-consent input:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+
+    .consent-field.has-error .form-consent input { border-color: var(--danger); }
+    .consent-field .field-error { margin: 8px 0 0 34px; }
+
+    .appointment-form .button {
+      width: 100%;
+      min-height: 56px;
+    }
+
+    .spinner {
+      display: none;
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255, 255, 255, .35);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+
+    .button.is-loading { pointer-events: none; opacity: .9; }
+    .button.is-loading .spinner { display: block; }
+    .button.is-loading .arrow { display: none; }
+    .button.shake { animation: shake .5s var(--ease); }
+
+    .form-result {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      max-height: 0;
+      margin-top: 0;
+      padding: 0 16px;
+      overflow: hidden;
+      opacity: 0;
+      border-left: 3px solid var(--green);
+      border-radius: 4px var(--radius-sm) var(--radius-sm) 4px;
+      background: #eaf2ec;
+      color: var(--green);
+      font-size: 14px;
+      font-weight: 600;
+      transition: max-height .5s var(--ease), opacity .4s, margin .5s var(--ease), padding .5s var(--ease);
+    }
+
+    .form-result::before {
+      content: "";
+      width: 22px;
+      height: 22px;
+      flex-shrink: 0;
+      border-radius: 50%;
+      background: var(--green) center / 13px no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5 12.5 4.5 4.5L19 7.5'/%3E%3C/svg%3E");
+    }
+
+    .form-result.visible {
+      max-height: 140px;
+      margin-top: 18px;
+      padding: 14px 16px;
+      opacity: 1;
+    }
+
+    .form-disclaimer {
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    /* ===== 10. UBICACIÓN Y PIE ===== */
+    .location-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(32px, 5vw, 70px);
+      align-items: center;
+    }
+
+    .location h2 { margin: 18px 0 20px; }
+
+    .location-copy > p {
+      color: var(--muted);
+      font-size: 16px;
+      margin-bottom: 24px;
+    }
+
+    .location-list {
+      display: grid;
+      gap: 14px;
+      margin-bottom: 30px;
+    }
+
+    .location-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      font-size: 15px;
+      color: var(--text);
+    }
+
+    .location-list .icon {
+      margin-top: 3px;
+      font-size: 20px;
+      color: var(--gold-ink);
+    }
+
+    .location-visual {
+      position: relative;
+      min-height: 360px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      background: linear-gradient(135deg, #e7e5d9, #f6f2e8);
+      box-shadow: var(--shadow-card);
+    }
+
+    .map-art {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .map-pin {
+      position: absolute;
+      left: 50%;
+      top: 38%;
+      width: 0;
+      height: 0;
+    }
+
+    .map-pin::before,
+    .map-pin::after {
+      content: "";
+      position: absolute;
+      left: -22px;
+      top: -22px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1.5px solid var(--green);
+      opacity: 0;
+      animation: pulse 3s ease-out infinite;
+    }
+
+    .map-pin::after { animation-delay: 1.5s; }
+
+    .map-pin .dot {
+      position: absolute;
+      left: -22px;
+      top: -22px;
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--green);
+      color: var(--gold-light);
+      font-size: 22px;
+      box-shadow: 0 14px 28px -10px rgba(23, 61, 50, .6);
+    }
+
+    .map-card {
+      position: absolute;
+      left: 20px;
+      right: 20px;
+      bottom: 20px;
+      padding: 18px 22px;
+      border-radius: var(--radius-md);
+      text-align: center;
+      background: rgba(255, 255, 255, .78);
+      border: 1px solid rgba(255, 255, 255, .7);
+      -webkit-backdrop-filter: blur(14px);
+      backdrop-filter: blur(14px);
+      color: var(--green);
+    }
+
+    .map-card strong {
+      display: block;
+      font-family: var(--font-display);
+      font-size: 22px;
+      font-weight: 400;
+    }
+
+    .map-card p {
+      margin-top: 2px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .footer {
+      position: relative;
+      overflow: hidden;
+      margin-top: 20px;
+      padding: 64px 0 28px;
+      border-radius: clamp(26px, 3.4vw, 48px) clamp(26px, 3.4vw, 48px) 0 0;
+      background: var(--green-deep);
+      color: #fff;
+    }
+
+    .footer .brand { color: #fff; }
+
+    .footer-main {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 35px;
+      padding-bottom: 40px;
+    }
+
+    .footer-copy {
+      max-width: 340px;
+      color: #c2cec6;
+      font-size: 14px;
+      margin-top: 16px;
+    }
+
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px 28px;
+      font-size: 14px;
+      color: #e2e6e1;
+    }
+
+    .footer-links a {
+      position: relative;
+      padding: 4px 0;
+    }
+
+    .footer-links a::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 1px;
+      background: var(--gold-light);
+      scale: 0 1;
+      transform-origin: left;
+      transition: scale .5s var(--ease);
+    }
+
+    .footer-links a:hover::after { scale: 1 1; }
+
+    .footer-bottom {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      padding-top: 24px;
+      border-top: 1px solid rgba(255, 255, 255, .16);
+      color: #b7c3bb;
+      font-size: 12px;
+    }
+
+    .to-top {
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(255, 255, 255, .25);
+      border-radius: 50%;
+      color: #fff;
+      font-size: 18px;
+      transition: background-color .35s, color .35s, translate .45s var(--ease);
+    }
+
+    .to-top:hover {
+      background: var(--gold-light);
+      color: var(--green-deep);
+      translate: 0 -4px;
+    }
+
+    /* ===== 11. ANIMACIONES AL HACER SCROLL ===== */
+    .js [data-reveal] {
+      opacity: 0;
+      translate: 0 32px;
+      transition:
+        opacity 1s var(--ease) var(--d, 0ms),
+        translate 1s var(--ease) var(--d, 0ms),
+        scale 1s var(--ease) var(--d, 0ms),
+        filter 1s var(--ease) var(--d, 0ms);
+    }
+
+    .js [data-reveal="scale"] { translate: 0 24px; scale: .95; }
+    .js [data-reveal="left"]  { translate: -44px 0; }
+    .js [data-reveal="right"] { translate: 44px 0; }
+    .js [data-reveal="blur"]  { filter: blur(8px); }
+
+    .js [data-reveal].is-visible {
+      opacity: 1;
+      translate: 0 0;
+      scale: 1;
+      filter: none;
+    }
+
+    /* Tarjetas: conservan la transición de elevación al hacer hover */
+    .js .specialty-card[data-reveal],
+    .js .team-card[data-reveal] {
+      transition:
+        opacity 1s var(--ease) var(--d, 0ms),
+        translate 1s var(--ease) var(--d, 0ms),
+        transform .45s var(--ease),
+        box-shadow .45s var(--ease),
+        border-color .45s;
+    }
+
+    /* Imágenes: se abren con una máscara */
+    .js [data-reveal="image"] {
+      opacity: 1;
+      translate: 0 0;
+      clip-path: inset(10% 8% 10% 8% round var(--radius-lg));
+      transition: clip-path 1.4s var(--ease) var(--d, 0ms);
+    }
+
+    .js [data-reveal="image"] img {
+      scale: 1.16;
+      transition: scale 2s var(--ease) var(--d, 0ms);
+    }
+
+    .js [data-reveal="image"].is-visible { clip-path: inset(0 0 0 0 round var(--radius-lg)); }
+    .js [data-reveal="image"].is-visible img { scale: 1; }
+
+    /* ===== 12. KEYFRAMES ===== */
+    @keyframes lineUp   { from { transform: translateY(108%); } }
+    @keyframes fadeUp   { from { opacity: 0; translate: 0 28px; } }
+    @keyframes fadeUpT  { from { opacity: 0; transform: translateY(28px); } }
+    @keyframes fadeIn   { from { opacity: 0; } }
+    @keyframes imgSettle { from { scale: 1.22; } }
+    @keyframes shimmer  { to { background-position: 100% 0; } }
+    @keyframes floatA   { to { transform: translate3d(-40px, 50px, 0) scale(1.08); } }
+    @keyframes floatB   { to { transform: translate3d(50px, -40px, 0) scale(1.1); } }
+    @keyframes ripple   { from { transform: scale(0); opacity: .28; } to { transform: scale(1); opacity: 0; } }
+    @keyframes spin     { to { transform: rotate(360deg); } }
+    @keyframes pulse    { 0% { transform: scale(.7); opacity: .7; } 100% { transform: scale(2.4); opacity: 0; } }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-7px); }
+      40% { transform: translateX(6px); }
+      60% { transform: translateX(-4px); }
+      80% { transform: translateX(3px); }
+    }
+
+    /* ===== 13. RESPONSIVE ===== */
+    @media (max-width: 1040px) {
+      .specialty-card { padding: 30px 26px 28px; }
+      .image-caption { left: -18px; }
+    }
+
+    @media (max-width: 860px) {
+      :root { --header-h: 72px; }
+
+      .container { width: min(100% - 36px, var(--container)); }
+      .brand { font-size: 23px; }
+
+      .menu-toggle { display: block; }
+      .nav > .button { display: none; }
+
+      /* Panel del menú móvil con entrada escalonada */
+      .nav-links {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        height: calc(100dvh - var(--header-h));
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: flex-start;
+        gap: 0;
+        padding: 16px 24px 40px;
+        overflow-y: auto;
+        background: var(--cream);
+        visibility: hidden;
+        opacity: 0;
+        translate: 0 -12px;
+        transition: opacity .4s var(--ease), translate .5s var(--ease), visibility 0s linear .5s;
+      }
+
+      .nav-links.open {
+        visibility: visible;
+        opacity: 1;
+        translate: 0 0;
+        transition-delay: 0s;
+      }
+
+      .nav-links li {
+        border-bottom: 1px solid var(--border);
+        opacity: 0;
+        translate: 0 18px;
+        transition: opacity .25s, translate .25s;
+      }
+
+      .nav-links.open li {
+        opacity: 1;
+        translate: 0 0;
+        transition:
+          opacity .6s var(--ease) calc(var(--i, 0) * 70ms + 120ms),
+          translate .6s var(--ease) calc(var(--i, 0) * 70ms + 120ms);
+      }
+
+      .nav-links a:not(.button) {
+        display: block;
+        padding: 16px 0;
+        font-family: var(--font-display);
+        font-size: clamp(28px, 7vw, 36px);
+        color: var(--green);
+      }
+
+      .nav-links a:not(.button)::after { display: none; }
+      .nav-links a[aria-current="true"] { color: var(--gold-ink); }
+
+      .nav-links li.nav-cta-mobile {
+        display: block;
+        border-bottom: 0;
+        padding-top: 28px;
+      }
+
+      .nav-cta-mobile .button { width: 100%; }
+
+      .mobile-cta {
+        display: inline-flex;
+        position: fixed;
+        left: 50%;
+        bottom: calc(16px + env(safe-area-inset-bottom));
+        z-index: 40;
+        translate: -50% 24px;
+        opacity: 0;
+        visibility: hidden;
+        box-shadow: 0 20px 40px -14px rgba(13, 40, 32, .7);
+        transition:
+          opacity .4s var(--ease),
+          translate .5s var(--ease),
+          background-color .35s var(--ease),
+          box-shadow .35s var(--ease),
+          transform .2s var(--ease),
+          visibility 0s linear .5s;
+      }
+
+      .mobile-cta.show {
+        opacity: 1;
+        visibility: visible;
+        translate: -50% 0;
+        transition-delay: 0s;
+      }
+
+      .hero-grid {
+        grid-template-columns: 1fr;
+        gap: 44px;
+      }
+
+      .hero-copy { padding: 8px 0; }
+      .hero h1 { font-size: clamp(40px, 11vw, 64px); }
+      .hero-visual { margin-inline: auto; max-width: 520px; }
+      .hero-media { height: clamp(360px, 60vh, 520px); }
+      .hero-ring { top: -12px; left: -12px; right: 12px; bottom: 12px; }
+      .image-caption { left: 12px; bottom: 28px; }
+
+      .trust-grid { grid-template-columns: 1fr; gap: 0; }
+
+      .trust-item {
+        justify-content: flex-start;
+        padding: 16px 0;
+        border-right: 0;
+        border-bottom: 1px solid rgba(255, 255, 255, .16);
+      }
+
+      .trust-item:last-child { border-bottom: 0; }
+
+      .specialty-grid,
+      .team-grid { grid-template-columns: 1fr; }
+
+      .about-grid,
+      .appointment-grid,
+      .location-grid { grid-template-columns: 1fr; }
+
+      .about-visual::before { inset: 18px -10px -14px 18px; }
+      .about-media { height: clamp(320px, 80vw, 440px); }
+      .team-photo-wrap { aspect-ratio: 4 / 3.6; }
+
+      .form-grid { grid-template-columns: 1fr; }
+      .field-full { grid-column: auto; }
+
+      .location-visual { min-height: 320px; }
+
+      .footer-main { flex-direction: column; }
+      .footer { padding-bottom: 96px; }
+    }
+
+    @media (max-width: 420px) {
+      .hero-actions .button { width: 100%; }
+      .image-caption { max-width: calc(100% - 24px); }
+      .appointment-form { padding: 24px 18px; }
+    }
+
+    /* ===== 14. ACCESIBILIDAD: MOVIMIENTO REDUCIDO ===== */
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
+        animation-delay: 0s !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+        transition-delay: 0s !important;
+      }
+
+      .js [data-reveal],
+      .js [data-reveal="image"] {
+        opacity: 1 !important;
+        translate: 0 0 !important;
+        scale: 1 !important;
+        filter: none !important;
+        clip-path: none !important;
+      }
+
+      .js [data-reveal="image"] img { scale: 1 !important; }
+      .orb { display: none; }
+    }
+  </style>
+</head>
+
+<body>
+  <a class="skip-link" href="#contenido">Saltar al contenido</a>
+  <div class="progress" aria-hidden="true"><span id="progressBar"></span></div>
+
+  <!-- Iconos reutilizables -->
+  <svg class="sprite" aria-hidden="true" focusable="false">
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M7 17 17 7M8.5 7H17v8.5"/></symbol>
+    <symbol id="i-cross" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-drop" viewBox="0 0 24 24"><path d="M12 3.5c3.2 3.8 6 6.6 6 10.2a6 6 0 0 1-12 0c0-3.6 2.8-6.4 6-10.2Z"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3.5 19 6.5v5.2c0 4.6-3 7.8-7 9.3-4-1.5-7-4.7-7-9.3V6.5l7-3Z"/><path d="m9 12 2.2 2.2L15.2 10"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3.5"/><path d="M5 20c.6-3.6 3.4-5.5 7-5.5s6.4 1.9 7 5.5"/></symbol>
+    <symbol id="i-rings" viewBox="0 0 24 24"><circle cx="9" cy="12" r="5.5"/><circle cx="15" cy="12" r="5.5"/></symbol>
+    <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M5 19c-.5-8 4.5-14 14.5-14.5C20 14 14.5 19.5 5 19Z"/><path d="M5 19c2.5-4.5 5.5-7.5 9.5-9.5"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s6.5-5.6 6.5-11a6.5 6.5 0 0 0-13 0c0 5.4 6.5 11 6.5 11Z"/><circle cx="12" cy="10" r="2.3"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.01"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.4a4.3 4.3 0 0 1 7.5 2.4C19.5 15.4 12 20 12 20Z"/></symbol>
+    <symbol id="i-up" viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"/></symbol>
+  </svg>
+
+  <!-- CABECERA -->
+  <header class="header" id="header">
+    <nav class="nav container" aria-label="Navegación principal">
+      <a class="brand" href="#inicio" aria-label="Aurelia Clinic, inicio">
+        AURELIA
+        <small>PRIVATE CLINIC</small>
+      </a>
+
+      <button
+        class="menu-toggle"
+        id="menuToggle"
+        type="button"
+        aria-label="Abrir menú"
+        aria-expanded="false"
+        aria-controls="navLinks"
+      ><span></span><span></span></button>
+
+      <ul class="nav-links" id="navLinks">
+        <li style="--i:0"><a href="#inicio">Inicio</a></li>
+        <li style="--i:1"><a href="#especialidades">Especialidades</a></li>
+        <li style="--i:2"><a href="#nosotros">La clínica</a></li>
+        <li style="--i:3"><a href="#equipo">Equipo</a></li>
+        <li style="--i:4"><a href="#contacto">Contacto</a></li>
+        <li class="nav-cta-mobile" style="--i:5">
+          <a href="#citas" class="button button-primary">
+            Solicitar cita <svg class="icon arrow" aria-hidden="true"><use href="#i-arrow"/></svg>
+          </a>
+        </li>
+      </ul>
+
+      <a href="#citas" class="button button-primary">
+        Solicitar cita <svg class="icon arrow" aria-hidden="true"><use href="#i-arrow"/></svg>
+      </a>
+    </nav>
+  </header>
+
+  <main id="contenido">
+    <!-- HERO -->
+    <section class="hero" id="inicio">
+      <div class="hero-bg" aria-hidden="true">
+        <div class="orb orb-gold" data-parallax="0.07"></div>
+        <div class="orb orb-green" data-parallax="-0.06"></div>
+        <div class="grain"></div>
+      </div>
+
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <span class="eyebrow hero-fade" style="--d:100ms">Medicina privada · Atención personal</span>
+
+          <h1>
+            <span class="line"><span class="line-inner" style="--d:220ms">Cuidamos de ti.</span></span>
+            <span class="line"><span class="line-inner" style="--d:340ms">En cada <em>etapa.</em></span></span>
+          </h1>
+
+          <p class="hero-fade" style="--d:560ms">
+            Un concepto de medicina centrado en las personas,
+            con atención cercana, espacios tranquilos y una
+            experiencia diseñada a tu medida.
+          </p>
+
+          <div class="hero-actions hero-fade" style="--d:680ms">
+            <a href="#citas" class="button button-primary">
+              Solicitar una cita <svg class="icon arrow" aria-hidden="true"><use href="#i-arrow"/></svg>
+            </a>
+
+            <a href="#especialidades" class="button button-outline">
+              Descubrir especialidades
+            </a>
+          </div>
+
+          <div class="hero-note hero-fade" style="--d:820ms">
+            <span class="rule"></span>
+            <span>Una atención más humana empieza por escucharte.</span>
+          </div>
+        </div>
+
+        <div class="hero-visual" id="heroVisual">
+          <span class="hero-ring" aria-hidden="true"></span>
+
+          <div class="hero-media">
+            <img
+              src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=1100&q=85"
+              alt="Interior luminoso de una clínica moderna"
+              data-parallax="0.05"
+              fetchpriority="high"
+              decoding="async"
+            >
+          </div>
+
+          <div class="image-caption">
+            <span class="caption-icon" aria-hidden="true"><svg class="icon"><use href="#i-heart"/></svg></span>
+            <div>
+              <strong>Tu bienestar, primero.</strong>
+              <span>Un espacio pensado para cuidarte.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FRANJA INFORMATIVA -->
+    <section class="trust-strip" aria-label="Nuestra filosofía">
+      <div class="container trust-grid">
+        <div class="trust-item" data-reveal style="--d:0ms">
+          <span class="trust-icon" aria-hidden="true"><svg class="icon"><use href="#i-user"/></svg></span>
+          <div>
+            <strong>Atención personalizada</strong>
+            <span>Cada persona importa.</span>
+          </div>
+        </div>
+
+        <div class="trust-item" data-reveal style="--d:120ms">
+          <span class="trust-icon" aria-hidden="true"><svg class="icon"><use href="#i-rings"/></svg></span>
+          <div>
+            <strong>Enfoque integral</strong>
+            <span>Una visión global de la salud.</span>
+          </div>
+        </div>
+
+        <div class="trust-item" data-reveal style="--d:240ms">
+          <span class="trust-icon" aria-hidden="true"><svg class="icon"><use href="#i-leaf"/></svg></span>
+          <div>
+            <strong>Entorno tranquilo</strong>
+            <span>Un espacio para sentirte bien.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ESPECIALIDADES -->
+    <section class="specialties section-pad" id="especialidades">
+      <div class="container">
+        <div class="section-heading center-heading" data-reveal="blur">
+          <span class="eyebrow">Qué hacemos</span>
+          <h2>La salud, desde una<br>perspectiva integral.</h2>
+          <p>
+            Diferentes áreas de atención reunidas bajo una misma
+            filosofía: escuchar, acompañar y cuidar.
+          </p>
+        </div>
+
+        <div class="specialty-grid">
+          <article class="specialty-card" data-reveal data-spotlight style="--d:0ms">
+            <span class="card-index" aria-hidden="true">01</span>
+            <div class="specialty-icon" aria-hidden="true"><svg class="icon"><use href="#i-cross"/></svg></div>
+            <h3>Medicina general</h3>
+            <p>
+              Atención médica inicial, seguimiento personalizado
+              y orientación para el cuidado de la salud.
+            </p>
+            <a class="text-link" href="#citas" data-specialty="Medicina general">
+              Consultar disponibilidad <svg class="icon arrow" aria-hidden="true"><use href="#i-arrow"/></svg>
+            </a>
+          </article>
+
+          <article class="specialty-card" data-reveal data-spotlight style="--d:120ms">
+            <span class="card-index" aria-hidden="true">02</span>
+            <div class="specialty-icon" aria-hidden="true"><svg class="icon"><use href="#i-drop"/></svg></div>
+            <h3>Dermatología</h3>
+            <p>
+              Evaluación y cuidado profesional de la piel,
+              con atención adaptada a cada persona.
+            </p>
+            <a class="text-link" href="#citas" data-specialty="Dermatología">
+              Consultar disponibilidad <svg class="icon arrow" aria-hidden="true"><use href="#i-arrow"/></svg>
+            </a>
+          </article>
+
+          <article class="specialty-card" data-reveal data-spotlight style="--d:240ms">
+            <span class="card-index" aria-hidden="true">03</span>
+            <div class="specialty-icon" aria-hidden="true"><svg class="icon"><use href="#i-shield"/></svg></div>
+            <h3>Salud preventiva</h3>
+            <p>
+              Orientación para adoptar hábitos saludables
+              y cuidar el bienestar a largo plazo.
+            </p>
+            <a class="text-link" href="#citas" data-specialty="Salud preventiva">
+              Consultar disponibilidad <svg class="icon arrow" aria-hidden="true"><use href="#i-arrow"/></svg>
+            </a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- SOBRE LA CLÍNICA -->
+    <section class="about section-pad" id="nosotros">
+      <div class="container about-grid">
+        <div class="about-visual">
+          <div class="about-media" data-reveal="image">
+            <img
+              src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1000&q=85"
+              alt="Profesional sanitaria en un entorno clínico"
+              data-parallax="0.05"
+              loading="lazy"
+              decoding="async"
+            >
+          </div>
+        </div>
+
+        <div class="about-copy">
+          <span class="eyebrow" data-reveal>Nuestra filosofía</span>
+          <h2 data-reveal="blur" style="--d:80ms">La confianza también forma parte del cuidado.</h2>
+
+          <p data-reveal style="--d:160ms">
+            En Aurelia Clinic imaginamos una medicina donde
+            la calidad profesional y el trato humano van de la mano.
+          </p>
+
+          <p data-reveal style="--d:220ms">
+            Queremos que cada visita comience con una conversación,
+            que tus preguntas tengan espacio y que entiendas las
+            opciones disponibles para tu atención.
+          </p>
+
+          <ul class="about-points">
+            <li data-reveal style="--d:280ms">
+              <span class="check" aria-hidden="true"><svg class="icon"><use href="#i-check"/></svg></span>
+              Escucha activa y comunicación clara.
+            </li>
+            <li data-reveal style="--d:360ms">
+              <span class="check" aria-hidden="true"><svg class="icon"><use href="#i-check"/></svg></span>
+              Atención adaptada a las necesidades de cada persona.
+            </li>
+            <li data-reveal style="--d:440ms">
+              <span class="check" aria-hidden="true"><svg class="icon"><use href="#i-check"/></svg></span>
+              Espacios cómodos y una experiencia sencilla.
+            </li>
+          </ul>
+
+          <a href="#citas" class="button button-primary" data-reveal style="--d:520ms">
+            Conocer la clínica <svg class="icon arrow" aria-hidden="true"><use href="#i-arrow"/></svg>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- EQUIPO DE DEMOSTRACIÓN -->
+    <section class="team section-pad" id="equipo">
+      <div class="container">
+        <div class="section-heading" data-reveal="blur">
+          <span class="eyebrow">Nuestro equipo</span>
+          <h2>Personas detrás del cuidado.</h2>
+          <p>
+            Un ejemplo de cómo presentar al equipo profesional
+            de una clínica de forma cercana y elegante.
+          </p>
+        </div>
+
+        <div class="team-grid">
+          <article class="team-card" data-reveal style="--d:0ms">
+            <div class="team-photo-wrap">
+              <img
+                class="team-photo"
+                src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&w=700&q=85"
+                alt="Retrato de ejemplo de un profesional sanitario"
+                loading="lazy"
+                decoding="async"
+              >
+            </div>
+            <div class="team-info">
+              <p class="team-role">Medicina general</p>
+              <h3>Dr. Alex Morgan</h3>
+              <p>Perfil profesional de ejemplo para esta demostración.</p>
+            </div>
+          </article>
+
+          <article class="team-card" data-reveal style="--d:120ms">
+            <div class="team-photo-wrap">
+              <img
+                class="team-photo"
+                src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=700&q=85"
+                alt="Retrato de ejemplo de una profesional sanitaria"
+                loading="lazy"
+                decoding="async"
+              >
+            </div>
+            <div class="team-info">
+              <p class="team-role">Dermatología</p>
+              <h3>Dra. Sofia Bennett</h3>
+              <p>Perfil profesional de ejemplo para esta demostración.</p>
+            </div>
+          </article>
+
+          <article class="team-card" data-reveal style="--d:240ms">
+            <div class="team-photo-wrap">
+              <img
+                class="team-photo"
+                src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=700&q=85"
+                alt="Retrato de ejemplo de un profesional sanitario"
+                loading="lazy"
+                decoding="async"
+              >
+            </div>
+            <div class="team-info">
+              <p class="team-role">Salud preventiva</p>
+              <h3>Dr. Daniel Reed</h3>
+              <p>Perfil profesional de ejemplo para esta demostración.</p>
+            </div>
+          </article>
+        </div>
+
+        <div class="demo-note" data-reveal>
+          <svg class="icon" aria-hidden="true"><use href="#i-info"/></svg>
+          <span>
+            Proyecto ficticio de portfolio. Los nombres, perfiles y
+            especialidades son ilustrativos; no representan un equipo médico real.
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- SOLICITUD DE CITA -->
+    <section class="appointment section-pad" id="citas">
+      <div class="grain" aria-hidden="true"></div>
+
+      <div class="container appointment-grid">
+        <div class="appointment-copy">
+          <span class="eyebrow" data-reveal>Estamos aquí para escucharte</span>
+          <h2 data-reveal="blur" style="--d:80ms">Tu próximo paso empieza con una conversación.</h2>
+
+          <p data-reveal style="--d:160ms">
+            Consulta la disponibilidad y cuéntanos cómo podemos
+            orientarte. En una clínica real, el equipo de recepción
+            se pondría en contacto para gestionar la solicitud.
+          </p>
+
+          <div class="contact-detail" data-reveal style="--d:220ms">
+            <svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg>
+            <div>
+              <span>Horario de ejemplo</span>
+              <p>Lunes a viernes · 09:00–18:00</p>
+            </div>
+          </div>
+
+          <div class="contact-detail" data-reveal style="--d:300ms">
+            <svg class="icon" aria-hidden="true"><use href="#i-pin"/></svg>
+            <div>
+              <span>Ubicación de ejemplo</span>
+              <p>Barcelona, España · Dirección ficticia</p>
+            </div>
+          </div>
+
+          <div class="contact-detail" data-reveal style="--d:380ms">
+            <svg class="icon" aria-hidden="true"><use href="#i-info"/></svg>
+            <div>
+              <span>Importante</span>
+              <p>Esta página es una demostración, no una clínica operativa.</p>
+            </div>
+          </div>
+        </div>
+
+        <form class="appointment-form" id="appointmentForm" data-reveal="scale" style="--d:120ms">
+          <h3>Solicita una cita</h3>
+          <p class="form-intro">
+            Completa los campos para probar el formulario de demostración.
+          </p>
+
+          <div class="form-grid">
+            <div class="field">
+              <label for="name">Nombre</label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                placeholder="Tu nombre"
+                autocomplete="given-name"
+                minlength="2"
+                maxlength="60"
+                aria-describedby="name-error"
+                required
+              >
+              <span class="field-error" id="name-error"></span>
+            </div>
+
+            <div class="field">
+              <label for="surname">Apellidos</label>
+              <input
+                type="text"
+                id="surname"
+                name="surname"
+                placeholder="Tus apellidos"
+                autocomplete="family-name"
+                maxlength="80"
+                aria-describedby="surname-error"
+                required
+              >
+              <span class="field-error" id="surname-error"></span>
+            </div>
+
+            <div class="field">
+              <label for="email">Correo electrónico</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="nombre@correo.com"
+                autocomplete="email"
+                maxlength="120"
+                aria-describedby="email-error"
+                required
+              >
+              <span class="field-error" id="email-error"></span>
+            </div>
+
+            <div class="field">
+              <label for="phone">Teléfono (opcional)</label>
+              <input
+                type="tel"
+                id="phone"
+                name="phone"
+                placeholder="Tu teléfono"
+                autocomplete="tel"
+                maxlength="25"
+              >
+            </div>
+
+            <div class="field field-full">
+              <label for="specialty">Área de interés</label>
+              <select id="specialty" name="specialty" aria-describedby="specialty-error" required>
+                <option value="">Selecciona una opción</option>
+                <option value="Medicina general">Medicina general</option>
+                <option value="Dermatología">Dermatología</option>
+                <option value="Salud preventiva">Salud preventiva</option>
+                <option value="Otra consulta">Otra consulta</option>
+              </select>
+              <span class="field-error" id="specialty-error"></span>
+            </div>
+
+            <div class="field field-full">
+              <label for="date">Fecha preferida</label>
+              <input type="date" id="date" name="date" aria-describedby="date-error" required>
+              <span class="field-error" id="date-error"></span>
+            </div>
+
+            <div class="field field-full">
+              <div class="label-row">
+                <label for="message">Comentario general (opcional)</label>
+                <span class="char-count" id="charCount" aria-hidden="true">0 / 300</span>
+              </div>
+              <textarea
+                id="message"
+                name="message"
+                maxlength="300"
+                placeholder="Indica brevemente tu preferencia de horario. No incluyas información médica."
+              ></textarea>
+            </div>
+          </div>
+
+          <div class="consent-field">
+            <label class="form-consent" for="consent">
+              <input type="checkbox" id="consent" aria-describedby="consent-error" required>
+              <span>
+                Entiendo que esta es una demostración y que los datos
+                no se enviarán a una clínica.
+              </span>
+            </label>
+            <span class="field-error" id="consent-error"></span>
+          </div>
+
+          <button class="button button-primary" id="submitBtn" type="submit">
+            <span class="spinner" aria-hidden="true"></span>
+            <span class="btn-label">Probar solicitud</span>
+            <svg class="icon arrow" aria-hidden="true"><use href="#i-arrow"/></svg>
+          </button>
+
+          <div class="form-result" id="formResult" role="status" aria-live="polite"></div>
+
+          <p class="form-disclaimer">
+            Demostración local: este formulario no envía ni guarda
+            los datos, no reserva citas y no ofrece confirmación médica.
+            No introduzcas información real.
+          </p>
+        </form>
+      </div>
+    </section>
+
+    <!-- UBICACIÓN -->
+    <section class="location section-pad" id="contacto">
+      <div class="container location-grid">
+        <div class="location-copy">
+          <span class="eyebrow" data-reveal>Dónde estamos</span>
+          <h2 data-reveal="blur" style="--d:80ms">Un espacio pensado para ti.</h2>
+          <p data-reveal style="--d:160ms">
+            En el sitio definitivo se pueden añadir la dirección real,
+            un mapa, indicaciones de transporte y opciones de aparcamiento.
+          </p>
+
+          <ul class="location-list" data-reveal style="--d:220ms">
+            <li>
+              <svg class="icon" aria-hidden="true"><use href="#i-pin"/></svg>
+              <span><strong>Ubicación:</strong> Barcelona, España (ficticia).</span>
+            </li>
+            <li>
+              <svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg>
+              <span><strong>Horario:</strong> Lunes a viernes, 09:00–18:00 (ejemplo).</span>
+            </li>
+          </ul>
+
+          <a href="#citas" class="text-link" data-reveal style="--d:300ms">
+            Consultar una cita <svg class="icon arrow" aria-hidden="true"><use href="#i-arrow"/></svg>
+          </a>
+        </div>
+
+        <div class="location-visual" role="group" aria-label="Espacio reservado para el mapa de la clínica" data-reveal="scale" style="--d:120ms">
+          <svg class="map-art" viewBox="0 0 600 400" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+            <g fill="none" stroke="#173d32" stroke-opacity=".09" stroke-width="1">
+              <path d="M0 70H600M0 150H600M0 245H600M0 325H600"/>
+              <path d="M85 0V400M190 0V400M320 0V400M440 0V400M535 0V400"/>
+            </g>
+            <g fill="#173d32" fill-opacity=".05">
+              <rect x="100" y="84" width="76" height="54" rx="8"/>
+              <rect x="334" y="84" width="92" height="54" rx="8"/>
+              <rect x="206" y="164" width="100" height="68" rx="8"/>
+              <rect x="454" y="164" width="68" height="68" rx="8"/>
+              <rect x="100" y="260" width="76" height="52" rx="8"/>
+              <rect x="334" y="260" width="92" height="52" rx="8"/>
+            </g>
+            <rect x="454" y="258" width="70" height="56" rx="10" fill="#9fbfa9" fill-opacity=".35"/>
+            <path d="M-20 330 260 200 620 55" fill="none" stroke="#b69a63" stroke-opacity=".45" stroke-width="14" stroke-linecap="round"/>
+            <path d="M-20 330 260 200 620 55" fill="none" stroke="#f8f6f0" stroke-width="8" stroke-linecap="round"/>
+          </svg>
+
+          <div class="map-pin" aria-hidden="true">
+            <span class="dot"><svg class="icon"><use href="#i-pin"/></svg></span>
+          </div>
+
+          <div class="map-card">
+            <strong>Tu clínica, más cerca.</strong>
+            <p>Espacio reservado para mapa y dirección real.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- PIE DE PÁGINA -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-main">
+        <div>
+          <a class="brand" href="#inicio">
+            AURELIA
+            <small>PRIVATE CLINIC</small>
+          </a>
+          <p class="footer-copy">
+            Un concepto de atención médica centrado en las personas.
+            Diseño ficticio creado como proyecto de portfolio.
+          </p>
+        </div>
+
+        <div class="footer-links">
+          <a href="#especialidades">Especialidades</a>
+          <a href="#nosotros">La clínica</a>
+          <a href="#equipo">Equipo</a>
+          <a href="#citas">Solicitar cita</a>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>© <span id="year"></span> Aurelia Clinic · Proyecto ficticio.</span>
+        <span>Todos los nombres, perfiles y datos del negocio son ilustrativos.</span>
+        <a class="to-top" href="#inicio" aria-label="Volver arriba"><svg class="icon" aria-hidden="true"><use href="#i-up"/></svg></a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- CTA flotante en móvil -->
+  <a href="#citas" class="button button-primary mobile-cta" id="mobileCta">
+    Solicitar cita <svg class="icon arrow" aria-hidden="true"><use href="#i-arrow"/></svg>
+  </a>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const root = document.documentElement;
+      const $ = (sel, ctx = document) => ctx.querySelector(sel);
+      const $$ = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
+
+      const mqReduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+      const mqMobile = window.matchMedia("(max-width: 860px)");
+      const mqFine = window.matchMedia("(hover: hover) and (pointer: fine)");
+
+      const header = $("#header");
+      const toggle = $("#menuToggle");
+      const nav = $("#navLinks");
+      const progress = $("#progressBar");
+      const mobileCta = $("#mobileCta");
+
+      // ===== AÑO AUTOMÁTICO =====
+      $("#year").textContent = new Date().getFullYear();
+
+      // ===== FECHA MÍNIMA: HOY =====
+      const dateInput = $("#date");
+      const today = new Date();
+      dateInput.min = [
+        today.getFullYear(),
+        String(today.getMonth() + 1).padStart(2, "0"),
+        String(today.getDate()).padStart(2, "0")
+      ].join("-");
+
+      // ===== SCROLL: cabecera, progreso, parallax y CTA móvil (un único listener con rAF) =====
+      const parallaxEls = $$("[data-parallax]");
+      const parallaxVisible = new Set();
+      let inForm = false;
+      let ticking = false;
+
+      function runParallax() {
+        if (mqReduce.matches || mqMobile.matches) return;
+        const vh = window.innerHeight;
+        parallaxVisible.forEach((el) => {
+          const speed = parseFloat(el.dataset.parallax) || 0.05;
+          const rect = el.getBoundingClientRect();
+          const delta = rect.top + rect.height / 2 - vh / 2;
+          const value = Math.max(-40, Math.min(40, -delta * speed));
+          el.style.setProperty("--py", value.toFixed(1) + "px");
+        });
+      }
+
+      function update() {
+        ticking = false;
+        const y = window.scrollY;
+        const max = root.scrollHeight - window.innerHeight;
+
+        header.classList.toggle("is-scrolled", y > 8);
+        progress.style.transform = "scaleX(" + (max > 0 ? Math.min(1, y / max) : 0).toFixed(4) + ")";
+
+        const showCta = y > window.innerHeight * 0.7 && !inForm && !nav.classList.contains("open");
+        mobileCta.classList.toggle("show", showCta);
+
+        runParallax();
+      }
+
+      function requestUpdate() {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(update);
+      }
+
+      window.addEventListener("scroll", requestUpdate, { passive: true });
+      window.addEventListener("resize", requestUpdate, { passive: true });
+
+      if ("IntersectionObserver" in window) {
+        const pio = new IntersectionObserver((entries) => {
+          entries.forEach((en) => {
+            if (en.isIntersecting) parallaxVisible.add(en.target);
+            else parallaxVisible.delete(en.target);
+          });
+          requestUpdate();
+        }, { rootMargin: "120px 0px" });
+        parallaxEls.forEach((el) => pio.observe(el));
+
+        // Oculta el CTA flotante cuando ya se ve el formulario
+        new IntersectionObserver((entries) => {
+          inForm = entries[0].isIntersecting;
+          requestUpdate();
+        }, { threshold: 0.08 }).observe($("#citas"));
+      }
+
+      function resetParallax() {
+        parallaxEls.forEach((el) => el.style.removeProperty("--py"));
+        requestUpdate();
+      }
+      mqMobile.addEventListener("change", resetParallax);
+      mqReduce.addEventListener("change", resetParallax);
+
+      // ===== MENÚ MÓVIL =====
+      function setMenu(open) {
+        nav.classList.toggle("open", open);
+        header.classList.toggle("menu-open", open);
+        root.classList.toggle("no-scroll", open);
+        toggle.setAttribute("aria-expanded", String(open));
+        toggle.setAttribute("aria-label", open ? "Cerrar menú" : "Abrir menú");
+        requestUpdate();
+      }
+
+      toggle.addEventListener("click", () => setMenu(!nav.classList.contains("open")));
+
+      nav.addEventListener("click", (event) => {
+        if (event.target.closest("a")) setMenu(false);
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && nav.classList.contains("open")) {
+          setMenu(false);
+          toggle.focus();
+        }
+      });
+
+      // Reinicia el menú al pasar a escritorio (mismo punto de corte que el CSS)
+      mqMobile.addEventListener("change", (event) => {
+        if (!event.matches) setMenu(false);
+      });
+
+      // ===== ENLACE ACTIVO SEGÚN LA SECCIÓN VISIBLE =====
+      if ("IntersectionObserver" in window) {
+        const links = new Map(
+          $$('.nav-links a:not(.button)[href^="#"]').map((a) => [a.getAttribute("href").slice(1), a])
+        );
+        const sectionObserver = new IntersectionObserver((entries) => {
+          entries.forEach((en) => {
+            if (!en.isIntersecting) return;
+            links.forEach((a) => a.removeAttribute("aria-current"));
+            const active = links.get(en.target.id);
+            if (active) active.setAttribute("aria-current", "true");
+          });
+        }, { rootMargin: "-45% 0px -50% 0px" });
+
+        ["inicio", "especialidades", "nosotros", "equipo", "citas", "contacto"].forEach((id) => {
+          const section = document.getElementById(id);
+          if (section) sectionObserver.observe(section);
+        });
+      }
+
+      // ===== REVELADO AL HACER SCROLL =====
+      const revealEls = $$("[data-reveal]");
+      if (!("IntersectionObserver" in window) || mqReduce.matches) {
+        revealEls.forEach((el) => el.classList.add("is-visible"));
+      } else {
+        const revealObserver = new IntersectionObserver((entries) => {
+          entries.forEach((en) => {
+            if (!en.isIntersecting) return;
+            en.target.classList.add("is-visible");
+            revealObserver.unobserve(en.target);
+          });
+        }, { threshold: 0.15, rootMargin: "0px 0px -8% 0px" });
+        revealEls.forEach((el) => revealObserver.observe(el));
+      }
+
+      // ===== BOTONES: efecto ola al pulsar + atracción magnética del cursor =====
+      $$(".button").forEach((btn) => {
+        btn.addEventListener("pointerdown", (event) => {
+          if (mqReduce.matches) return;
+          const rect = btn.getBoundingClientRect();
+          const size = Math.max(rect.width, rect.height) * 2;
+          const wave = document.createElement("span");
+          wave.className = "ripple";
+          wave.style.cssText =
+            "width:" + size + "px;height:" + size + "px;" +
+            "left:" + (event.clientX - rect.left - size / 2) + "px;" +
+            "top:" + (event.clientY - rect.top - size / 2) + "px;";
+          btn.appendChild(wave);
+          wave.addEventListener("animationend", () => wave.remove());
+        });
+
+        if (btn.id === "mobileCta" || btn.id === "submitBtn") return;
+
+        btn.addEventListener("pointermove", (event) => {
+          if (!mqFine.matches || mqReduce.matches) return;
+          const rect = btn.getBoundingClientRect();
+          const x = (event.clientX - (rect.left + rect.width / 2)) * 0.16;
+          const y = (event.clientY - (rect.top + rect.height / 2)) * 0.22;
+          btn.style.translate = x.toFixed(1) + "px " + y.toFixed(1) + "px";
+        }, { passive: true });
+
+        btn.addEventListener("pointerleave", () => { btn.style.translate = ""; });
+      });
+
+      // ===== TARJETAS: foco de luz que sigue al cursor =====
+      if (mqFine.matches && !mqReduce.matches) {
+        $$("[data-spotlight]").forEach((card) => {
+          card.addEventListener("pointermove", (event) => {
+            const rect = card.getBoundingClientRect();
+            card.style.setProperty("--x", (event.clientX - rect.left) + "px");
+            card.style.setProperty("--y", (event.clientY - rect.top) + "px");
+          }, { passive: true });
+        });
+      }
+
+      // ===== HERO: capas de profundidad que reaccionan al cursor =====
+      const hero = $("#inicio");
+      const heroVisual = $("#heroVisual");
+      if (hero && heroVisual && mqFine.matches && !mqReduce.matches) {
+        let frame = 0;
+        let mx = 0;
+        let my = 0;
+
+        const apply = () => {
+          frame = 0;
+          heroVisual.style.setProperty("--mx", mx.toFixed(3));
+          heroVisual.style.setProperty("--my", my.toFixed(3));
+        };
+
+        hero.addEventListener("pointermove", (event) => {
+          if (mqMobile.matches) return;
+          const rect = hero.getBoundingClientRect();
+          mx = (event.clientX - rect.left) / rect.width - 0.5;
+          my = (event.clientY - rect.top) / rect.height - 0.5;
+          if (!frame) frame = requestAnimationFrame(apply);
+        }, { passive: true });
+
+        hero.addEventListener("pointerleave", () => {
+          mx = 0;
+          my = 0;
+          if (!frame) frame = requestAnimationFrame(apply);
+        });
+      }
+
+      // ===== ESPECIALIDADES: preselecciona el área en el formulario =====
+      $$("[data-specialty]").forEach((link) => {
+        link.addEventListener("click", () => {
+          const select = $("#specialty");
+          select.value = link.dataset.specialty;
+          select.dispatchEvent(new Event("input", { bubbles: true }));
+        });
+      });
+
+      // ===== FORMULARIO DE DEMOSTRACIÓN =====
+      const form = $("#appointmentForm");
+      const result = $("#formResult");
+      const submitBtn = $("#submitBtn");
+      const submitLabel = $(".btn-label", submitBtn);
+      const charCount = $("#charCount");
+      const fields = $$("input, select, textarea", form);
+
+      // La validación visual la gestiona el script (sin JS se usa la nativa del navegador)
+      form.noValidate = true;
+
+      function messageFor(el) {
+        const v = el.validity;
+        if (v.valueMissing) {
+          if (el.type === "checkbox") return "Necesitamos que aceptes esta casilla para continuar.";
+          if (el.tagName === "SELECT") return "Selecciona una opción.";
+          return "Este campo es obligatorio.";
+        }
+        if (v.typeMismatch) return "Introduce un correo electrónico válido.";
+        if (v.tooShort) return "Escribe al menos " + el.minLength + " caracteres.";
+        if (v.rangeUnderflow) return "Elige una fecha a partir de hoy.";
+        if (v.badInput) return "Introduce una fecha válida.";
+        return "No es un valor válido.";
+      }
+
+      function validate(el) {
+        const msg = el.validity.valid ? "" : messageFor(el);
+        const error = document.getElementById(el.id + "-error");
+        if (error) error.textContent = msg;
+        el.setAttribute("aria-invalid", msg ? "true" : "false");
+        const wrap = el.closest(".field, .consent-field");
+        if (wrap) wrap.classList.toggle("has-error", Boolean(msg));
+        return !msg;
+      }
+
+      function clearResult() {
+        result.classList.remove("visible");
+        result.textContent = "";
+      }
+
+      form.addEventListener("focusout", (event) => {
+        if (!fields.includes(event.target)) return;
+        event.target.dataset.touched = "1";
+        validate(event.target);
+      });
+
+      form.addEventListener("input", (event) => {
+        clearResult();
+        const el = event.target;
+        if (el.id === "message") charCount.textContent = el.value.length + " / " + el.maxLength;
+        if (el.dataset.touched) validate(el);
+      });
+
+      function setLoading(loading) {
+        submitBtn.classList.toggle("is-loading", loading);
+        submitBtn.disabled = loading;
+        submitBtn.setAttribute("aria-busy", String(loading));
+        submitLabel.textContent = loading ? "Procesando…" : "Probar solicitud";
+      }
+
+      form.addEventListener("submit", (event) => {
+        // Evita que el formulario se envíe a otro lugar.
+        event.preventDefault();
+
+        // Valida todos los campos y enfoca el primero con error.
+        let firstInvalid = null;
+        fields.forEach((el) => {
+          el.dataset.touched = "1";
+          if (!validate(el) && !firstInvalid) firstInvalid = el;
+        });
+
+        if (firstInvalid) {
+          firstInvalid.focus();
+          submitBtn.classList.remove("shake");
+          void submitBtn.offsetWidth;
+          submitBtn.classList.add("shake");
+          return;
+        }
+
+        setLoading(true);
+
+        // Solo feedback visual: no se envía ni se guarda ningún dato.
+        window.setTimeout(() => {
+          setLoading(false);
+          result.textContent = "Prueba completada. No se ha enviado ni guardado ningún dato.";
+          result.classList.add("visible");
+        }, mqReduce.matches ? 0 : 700);
+      });
+
+      submitBtn.addEventListener("animationend", () => submitBtn.classList.remove("shake"));
+
+      requestUpdate();
+    })();
+  </script>
+</body>
+</html>
